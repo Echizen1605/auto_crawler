@@ -3,6 +3,7 @@ import lxml
 from lxml import etree
 import requests
 import re
+import math
 
 reg = re.compile('<script.*?/script>', re.DOTALL)
 reg1 = re.compile('<style.*?</style>', re.DOTALL)
@@ -89,6 +90,29 @@ class defined_tuple(object):
 		return hash(self.mytuple[1]) ^ hash(self.mytuple[2])
 
 
+class defined_cos(object):
+	def __init__(self, mytuple):
+		self.mytuple = mytuple
+	def __eq__(self, other):
+		return self.mytuple[1] == other.mytuple[1] and self.mytuple[3] == other.mytuple[3]
+	def __hash__(self):
+		return hash(self.mytuple[1]) ^ hash(self.mytuple[3])
+
+
+def cos_calculate(tree_list1, tree_list2):
+	myset = set()
+	tree1_set = set(tree_list1)
+	tree2_set = set(tree_list2)
+	print len(tree1_set)
+	print len(tree2_set)
+	print len(tree1_set & tree2_set)
+	myset.union(tree1_set)
+	myset.union(tree2_set)
+	result = len(tree1_set & tree2_set)/math.sqrt((len(tree1_set)*len(tree2_set)))
+	print result
+
+
+
 if __name__ == '__main__':
 	list1 = []
 	list2 = []
@@ -118,3 +142,5 @@ if __name__ == '__main__':
 		for k in html.xpath(item):
 			if len(k.xpath('text()')) > 0:
 				print k.xpath('text()')[0]
+
+	cos_calculate(list1, list2)
