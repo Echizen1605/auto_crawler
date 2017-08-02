@@ -4,16 +4,19 @@ from lxml import etree
 import requests
 import re
 import math
+import jieba
 
 reg = re.compile('<script.*?/script>', re.DOTALL)
 reg1 = re.compile('<style.*?</style>', re.DOTALL)
 reg2 = re.compile('<!--.*?-->', re.DOTALL)
 reg_use = re.compile('comment|hidden|javascript|js|css', re.IGNORECASE)
 
-with open('job1.html','rb') as fp:
-	content = fp.read()
-with open('job2.html','rb') as fp:
-	content1 = fp.read()
+# with open('job1.html','rb') as fp:
+# 	content = fp.read()
+# with open('job2.html','rb') as fp:
+# 	content1 = fp.read()
+content = requests.get('https://job.dajie.com/80c1a5e9-668c-4c87-be30-052ffdf021e3.html').content
+content1 = requests.get('https://job.dajie.com/a8a0c51e-cbe4-4082-aa65-bcdc01389e2e.html').content
 
 content = reg.sub('',reg1.sub('',reg2.sub('',content)))
 content1 = reg.sub('',reg1.sub('',reg2.sub('',content1)))
@@ -44,8 +47,10 @@ def parser(html, name):
 		temp_dict['name'] = str(child.tag)
 		if child.text != None:
 			temp_dict['text'] = child.text.strip()
+			temp_dict['tokens'] = jieba.lcut(temp_dict['text'], cut_all=False)
 		else:
 			temp_dict['text'] = None
+			temp_dict['tokens'] = []
 		temp_dict['node'] = parser(child, temp_dict['path'])
 		temp_dict['index'] = count + 1
 		tempdict[count] = temp_dict
@@ -61,12 +66,13 @@ def wrapper_tree(html):
 	dictk['attribute'] = {}
 	dictk['path'] = '/html'
 	dictk['index'] = 1
+	dictk['tokens'] = []
 	return dictk
 
 def dict_to_tree(tree_dict, tree_list):
 	if not tree_dict.has_key('node'):
 		return
-	tree_tuple = (tree_dict['index'], tree_dict['path'], tree_dict['text'], str(tree_dict['attribute']))
+	tree_tuple = (tree_dict['index'], tree_dict['path'], tree_dict['text'], str(tree_dict['attribute']), str(tree_dict['tokens']))
 	if len(reg_use.findall(str(tree_dict['attribute']))) == 0 or len(reg_use.findall(str(tree_dict['path']))) == 0:
 		tree_list.append(tree_tuple)
 	tree_list.append(tree_tuple)
@@ -103,14 +109,16 @@ def cos_calculate(tree_list1, tree_list2):
 	myset = set()
 	tree1_set = set(tree_list1)
 	tree2_set = set(tree_list2)
-	print len(tree1_set)
-	print len(tree2_set)
-	print len(tree1_set & tree2_set)
+	# print len(tree1_set)
+	# print len(tree2_set)
+	# print len(tree1_set & tree2_set)
 	myset.union(tree1_set)
 	myset.union(tree2_set)
 	result = len(tree1_set & tree2_set)/math.sqrt((len(tree1_set)*len(tree2_set)))
 	print result
 
+def cmp_html(x, y):
+	return len(x)-len(y)
 
 
 if __name__ == '__main__':
@@ -142,5 +150,15 @@ if __name__ == '__main__':
 		for k in html.xpath(item):
 			if len(k.xpath('text()')) > 0:
 				print k.xpath('text()')[0]
+				lcut_list = jieba.lcut(k.xpath('text()')[0], cut_all=False)
+				print "-------------------------"
+				print "FOLLOWING CUT_LIST:"
+				print "-------------------------"
+				if '职位' in lcut_list:
+					for item in lcut_list:
+						print item
 
 	cos_calculate(list1, list2)
+	# xpath_list.sort(cmp_html)
+	# for i in xpath_list:
+	# 	print i
