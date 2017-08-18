@@ -12,15 +12,15 @@ reg1 = re.compile('<style.*?</style>', re.DOTALL)
 reg2 = re.compile('<!--.*?-->', re.DOTALL)
 reg_use = re.compile('comment|hidden|javascript|js|css', re.IGNORECASE)
 
-with open('job1.html','rb') as fp:
-	content = fp.read()
-with open('job2.html','rb') as fp:
-	content1 = fp.read()
+# with open('job1.html','rb') as fp:
+# 	content = fp.read()
+# with open('job2.html','rb') as fp:
+# 	content1 = fp.read()
 # content = requests.get('https://job.dajie.com/80c1a5e9-668c-4c87-be30-052ffdf021e3.html').content
 # content1 = requests.get('https://job.dajie.com/a8a0c51e-cbe4-4082-aa65-bcdc01389e2e.html').content
 
-# content = requests.get('http://my.yingjiesheng.com/job_805115.html').content
-# content1 = requests.get('http://my.yingjiesheng.com/job_805112.html').content
+content = requests.get('http://my.yingjiesheng.com/job_805115.html').content
+content1 = requests.get('http://my.yingjiesheng.com/job_805112.html').content
 
 content = reg.sub('',reg1.sub('',reg2.sub('',content)))
 content1 = reg.sub('',reg1.sub('',reg2.sub('',content1)))
@@ -150,16 +150,6 @@ def calculate_prefix(list1):
 		list_union.append(defined_pathlist(templist))
 		compare_list_one.append(copy.deepcopy(list1[i]))
 		compare_list_two.append(copy.deepcopy(templist))
-		
-	# remove_var = [k for k in list_union if k.mylist==[]]
-	# if len(remove_var) != 0:
-	# 	list_union.remove(remove_var[0])
-
-
-	# print '----------------------------------'
-	# print compare_list_one
-	# print '----------------------------------'
-	# print compare_list_two
 	print '************************************'
 	temp_addition_list = []
 	count = 0
@@ -176,18 +166,7 @@ def calculate_prefix(list1):
 		temp_s_path_list = copy.deepcopy(path_list)
 		for s_path in path_list:
 			for k in first_str_list:
-				# print first_list.count(k)
-				# if first_list.count(k) > 1:
 				for j in range(len(compare_list_one)):
-					# print path_list.index(s_path)
-					# print compare_list_one[j].startswith(s_path)
-					# print len(compare_list_two[j])-1 >= count
-					# print compare_list_two
-					# print count
-					# print compare_list_two[j][count]
-					# if compare_list_one[j].startswith(s_path) and len(compare_list_two[j])-1 >= count and compare_list_two[j][count] == k:
-					# 	temp_s_path_list[temp_s_path_list.index(s_path)] += k + "/"
-					# 	temp_s_path_list.append(s_path)
 					if compare_list_one[j].startswith(s_path):
 						if len(compare_list_two[j]) - 1 >= count:
 							if compare_list_two[j][count] == k:
@@ -199,20 +178,9 @@ def calculate_prefix(list1):
 		path_list = list(set(temp_s_path_list))
 		for path in temp_path_list:
 			path_list.remove(path)
-		# print path_list
 		count += 1
-		# print first_list
-		# print '--------------------------------'
-		# print first_str_list
-		# print '--------------------------------'
-		# print temp_path_list
-		# print '********************************'
-		# print path_list
-	print list(set(temp_addition_list))
-
-
-	
-		
+	for item in list(set(temp_addition_list)):
+		print item
 
 if __name__ == '__main__':
 	list1 = []
