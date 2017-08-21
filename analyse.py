@@ -279,6 +279,50 @@ def classify(xpath_list, html, cross_list):
 		count += 1
 	print xpath_info.keys()
 	print xpath_info
+	return xpath_info
+
+def define_max(a, b):
+	return a if a >= b else b
+
+def word_analyse(given_dict, page_info):
+	reg_job = re.compile(u'web|java|html|php|javascript|\.net|ios|android|ui|工程师|前端|高级|中级|初级|基础|软件|开发', re.IGNORECASE)
+	reg_company = re.compile(u'集团|有限|公司|企业|科技|股份|联盟|学院|合伙|事业|商务|传播|传媒', re.IGNORECASE)
+	reg_salary = re.compile(u'k|/年|/月|千|万|元', re.IGNORECASE)
+	reg_location = re.compile(u'北京|哈尔滨|长春|沈阳|天津|呼和浩特|乌鲁木齐|银川|西宁|兰州|西安|拉萨|成都|重庆|贵阳|昆明|太原|石家庄|济南|郑州|合肥|南京|上海|武汉|长沙|南昌|杭州|福州|台北|南宁|海口|广州|香港|澳门|区', re.IGNORECASE)
+	reg_date = re.compile(u'(\d\d\d\d-\d\d-\d\d)|(\d\d-\d\d-\d\d)|(\d\d-\d\d)')
+	reg_page = re.compile(u'下一页', re.DOTALL)
+	for block_key in given_dict.keys():
+		block_dict = given_dict[block_key]
+		print block_dict.keys()
+		for key in block_dict.keys():
+			count_job = 0
+			count_company = 0
+			count_salary = 0
+			count_location = 0
+			count_date = 0
+			max_size = 0
+			total = len(block_dict[key])
+			for item in block_dict[key]:
+				if len(reg_job.findall(item)) > 0:
+					count_job += 1
+				if len(reg_company.findall(item)) > 0:
+					count_company += 1
+				if len(reg_salary.findall(item)) > 0:
+					count_salary += 1
+				if len(reg_location.findall(item)) > 0:
+					count_location += 1
+				if len(reg_date.findall(item)) > 0:
+					count_date += 1
+				if len(reg_page.findall(item)) > 0:
+					page_info['page'] = key
+					break
+			max_size = define_max(count_job, define_max(count_company, define_max(count_salary, define_max(count_location, count_date))))
+			if total > 0:
+				if float(max_size) / total >= 0.8:
+					page_info[['count_job', 'count_company', 'count_salary', 'count_location', 'count_date'][[count_job, count_company, count_salary, count_location, count_date].index(max_size)]] = key
+	print page_info
+
+
 
 if __name__ == '__main__':
 	list1 = []
@@ -333,6 +377,9 @@ if __name__ == '__main__':
 	new_list.sort(cmp_html, reverse=True)
 	print new_list
 
-	classify(new_list, html, xpath_list)
 	
+
+	page_info = classify(new_list, html, xpath_list)
+	dict1 = {}
+	word_analyse(page_info, dict1)	
 
